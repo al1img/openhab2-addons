@@ -12,18 +12,27 @@
  */
 package org.openhab.binding.iotivity.internal;
 
-import static org.openhab.binding.iotivity.internal.IoTivityBindingConstants.THING_TYPE_DEVICE;
+import static org.openhab.binding.iotivity.internal.IoTivityBindingConstants.*;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.config.discovery.DiscoveryService;
+import org.eclipse.smarthome.core.thing.Bridge;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingTypeUID;
+import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.openhab.binding.iotivity.internal.discovery.IoTivityDiscoveryService;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -36,7 +45,12 @@ import org.osgi.service.component.annotations.Component;
 @Component(configurationPid = "binding.iotivity", service = ThingHandlerFactory.class)
 public class IoTivityHandlerFactory extends BaseThingHandlerFactory {
 
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_DEVICE);
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Stream
+            .concat(IoTivityBridgeHandler.SUPPORTED_THING_TYPES_UIDS.stream(),
+                    IoTivityHandler.SUPPORTED_THING_TYPES_UIDS.stream())
+            .collect(Collectors.toSet());
+
+    private Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegs = new HashMap<>();
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -47,10 +61,34 @@ public class IoTivityHandlerFactory extends BaseThingHandlerFactory {
     protected @Nullable ThingHandler createHandler(Thing thing) {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
-        if (THING_TYPE_DEVICE.equals(thingTypeUID)) {
+        if (THING_TYPE_BRIDGE.equals(thingTypeUID)) {
+            IoTivityBridgeHandler bridgeHandler = new IoTivityBridgeHandler((Bridge) thing);
+            registerIoTivityDiscoveryService(bridgeHandler);
+            return bridgeHandler;
+        } else if (THING_TYPE_DEVICE.equals(thingTypeUID)) {
             return new IoTivityHandler(thing);
         }
 
         return null;
     }
+
+    private synchronized void registerIoTivityDiscoveryService(IoTivityBridgeHandler bridgeHandler) {
+        IoTivityDiscoveryService discoveryService = new IoTivityDiscoveryService(bridgeHandler);
+        this.discoveryServiceRegs.put(bridgeHandler.getThing().getUID(),
+                bundleContext.registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<>()));
+    }
+
+    @Override
+    protected synchronized void removeHandler(ThingHandler thingHandler) {
+        if (thingHandler instanceof IoTivityBridgeHandler) {
+            ServiceRegistration<?> serviceReg = this.discoveryServiceRegs.remove(thingHandler.getThing().getUID());
+            if (serviceReg != null) {
+                // remove discovery service, if bridge handler is removed
+                IoTivityDiscoveryService discoveryService = (IoTivityDiscoveryService) bundleContext
+                        .getService(serviceReg.getReference());
+                serviceReg.unregister();
+            }
+        }
+    }
+
 }

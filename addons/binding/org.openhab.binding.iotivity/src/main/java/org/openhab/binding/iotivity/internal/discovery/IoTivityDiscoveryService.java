@@ -2,28 +2,25 @@ package org.openhab.binding.iotivity.internal.discovery;
 
 import static org.openhab.binding.iotivity.internal.IoTivityBindingConstants.THING_TYPE_DEVICE;
 
-import java.util.Collections;
-import java.util.Set;
-
 import org.eclipse.smarthome.config.discovery.AbstractDiscoveryService;
 import org.eclipse.smarthome.config.discovery.DiscoveryResult;
 import org.eclipse.smarthome.config.discovery.DiscoveryResultBuilder;
-import org.eclipse.smarthome.config.discovery.DiscoveryService;
-import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.ThingUID;
-import org.osgi.service.component.annotations.Component;
+import org.openhab.binding.iotivity.internal.IoTivityBridgeHandler;
+import org.openhab.binding.iotivity.internal.IoTivityHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(service = DiscoveryService.class, immediate = true, configurationPid = "discovery.iotivity")
 public class IoTivityDiscoveryService extends AbstractDiscoveryService {
-    private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_DEVICE);
     private static final int DISCOVER_TIMEOUT_SECONDS = 10;
 
     private Logger logger = LoggerFactory.getLogger(IoTivityDiscoveryService.class);
 
-    public IoTivityDiscoveryService() {
-        super(SUPPORTED_THING_TYPES_UIDS, DISCOVER_TIMEOUT_SECONDS, true);
+    private IoTivityBridgeHandler bridgeHandler;
+
+    public IoTivityDiscoveryService(IoTivityBridgeHandler bridgeHandler) {
+        super(IoTivityHandler.SUPPORTED_THING_TYPES_UIDS, DISCOVER_TIMEOUT_SECONDS, true);
+        this.bridgeHandler = bridgeHandler;
     }
 
     @Override

@@ -6,9 +6,11 @@
 
 	<!-- Sample Thing Type -->
 	<thing-type id="device">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="bridge" />
+		</supported-bridge-type-refs>
 		<label>IoTivity Device</label>
 		<description>Device thing for IoTivity Binding</description>
-
 	</thing-type>
 
 </thing:thing-descriptions>

@@ -14,12 +14,16 @@ package org.openhab.binding.iotivity.internal;
 
 import static org.openhab.binding.iotivity.internal.IoTivityBindingConstants.*;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
-import org.openhab.binding.iotivity.internal.IoTivityConfiguration;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
+import org.eclipse.smarthome.core.thing.ThingStatusDetail;
+import org.eclipse.smarthome.core.thing.ThingTypeUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
@@ -37,6 +41,8 @@ public class IoTivityHandler extends BaseThingHandler {
 
     private final Logger logger = LoggerFactory.getLogger(IoTivityHandler.class);
 
+    public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_DEVICE);
+
     @Nullable
     private IoTivityConfiguration config;
 
@@ -50,7 +56,7 @@ public class IoTivityHandler extends BaseThingHandler {
             if (command instanceof RefreshType) {
                 // TODO: handle data refresh
             }
-            
+
             // TODO: handle command
 
             // Note: if communication with thing fails for some reason,
@@ -62,12 +68,18 @@ public class IoTivityHandler extends BaseThingHandler {
 
     @Override
     public void initialize() {
-        // logger.debug("Start initializing!");
+        logger.debug("Start initializing");
+
         config = getConfigAs(IoTivityConfiguration.class);
 
+        if (getBridge() == null) {
+            updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
+            return;
+        }
+
         // TODO: Initialize the handler.
-        // The framework requires you to return from this method quickly. Also, before leaving this method a thing 
-        // status from one of ONLINE, OFFLINE or UNKNOWN must be set. This might already be the real thing status in 
+        // The framework requires you to return from this method quickly. Also, before leaving this method a thing
+        // status from one of ONLINE, OFFLINE or UNKNOWN must be set. This might already be the real thing status in
         // case you can decide it directly.
         // In case you can not decide the thing status directly (e.g. for long running connection handshake using WAN
         // access or similar) you should set status UNKNOWN here and then decide the real status asynchronously in the
