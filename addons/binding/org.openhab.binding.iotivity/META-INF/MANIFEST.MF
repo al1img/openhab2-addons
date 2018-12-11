@@ -6,6 +6,14 @@ Bundle-ClassPath:
  lib/iotivity.jar
 Bundle-ManifestVersion: 2
 Bundle-Name: IoTivity Binding
+Bundle-NativeCode: 
+ lib/x86-64/linux/liboc_logger.so;
+ lib/x86-64/linux/liboctbstack.so;
+ lib/x86-64/linux/liboc.so;
+ lib/x86-64/linux/libconnectivity_abstraction.so;
+ lib/x86-64/linux/libocstack-jni.so;
+ processor=amd64;osname=linux,
+ *
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: org.openhab.binding.iotivity;singleton:=true
 Bundle-Vendor: openHAB
