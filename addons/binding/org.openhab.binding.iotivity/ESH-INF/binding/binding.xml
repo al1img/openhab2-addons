@@ -7,4 +7,12 @@
 	<description>This is the binding for IoTivity.</description>
 	<author>Oleksandr Grytsov</author>
 
+	<config-description>
+		<parameter name="resource" type="text">
+			<label>Resource</label>
+			<description>Resource to find</description>
+			<required>false</required>
+		</parameter>
+	</config-description>
+
 </binding:binding>

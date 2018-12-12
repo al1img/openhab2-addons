@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
-import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.thing.ChannelUID;
 import org.eclipse.smarthome.core.thing.Thing;
 import org.eclipse.smarthome.core.thing.ThingStatus;
@@ -31,22 +30,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@link IoTivityHandler} is responsible for handling commands, which are
+ * The {@link IoTivityDeviceHandler} is responsible for handling commands, which are
  * sent to one of the channels.
  *
  * @author Oleksandr Grytsov - Initial contribution
  */
 @NonNullByDefault
-public class IoTivityHandler extends BaseThingHandler {
+public class IoTivityDeviceHandler extends BaseThingHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(IoTivityHandler.class);
+    private final Logger logger = LoggerFactory.getLogger(IoTivityDeviceHandler.class);
 
     public static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_DEVICE);
 
-    @Nullable
-    private IoTivityConfiguration config;
-
-    public IoTivityHandler(Thing thing) {
+    public IoTivityDeviceHandler(Thing thing) {
         super(thing);
     }
 
@@ -70,8 +66,6 @@ public class IoTivityHandler extends BaseThingHandler {
     public void initialize() {
         logger.debug("Start initializing");
 
-        config = getConfigAs(IoTivityConfiguration.class);
-
         if (getBridge() == null) {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.BRIDGE_UNINITIALIZED);
             return;
@@ -89,7 +83,7 @@ public class IoTivityHandler extends BaseThingHandler {
         // the framework is then able to reuse the resources from the thing handler initialization.
         // we set this upfront to reliably check status updates in unit tests.
         updateStatus(ThingStatus.UNKNOWN);
-        
+
         // Example for background initialization:
         scheduler.execute(() -> {
             boolean thingReachable = true; // <background task with long running initialization here>

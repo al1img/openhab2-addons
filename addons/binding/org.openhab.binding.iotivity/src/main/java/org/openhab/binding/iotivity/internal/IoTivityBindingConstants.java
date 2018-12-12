@@ -26,9 +26,6 @@ public class IoTivityBindingConstants {
 
     private static final String BINDING_ID = "iotivity";
 
-    // Bridge
-    public final static ThingTypeUID THING_TYPE_BRIDGE = new ThingTypeUID(BINDING_ID, "bridge");
-
     // List of all Thing Type UIDs
     public static final ThingTypeUID THING_TYPE_DEVICE = new ThingTypeUID(BINDING_ID, "device");
 
